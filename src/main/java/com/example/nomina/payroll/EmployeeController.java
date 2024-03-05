@@ -24,9 +24,28 @@ public class EmployeeController {
         return repository.save(newEmployee);
     }
 
-    @GetMapping("/Employees/{id}" )
+    @GetMapping("/employees/{id}" )
     Employee getOne(@PathVariable Long id){
-        return repository.getReferenceById(id);
+        return repository.findById(id)
+                .orElseThrow(()-> new EmployeeNotFoundException(id));
+    }
+
+    @PutMapping("/employees/{id}")
+    Employee remplaceEmployee (@RequestBody Employee newEmployee, @PathVariable Long id){
+
+        return repository.findById(id).map(employee -> {
+            employee.setName(newEmployee.getName());
+            employee.setRoll(newEmployee.getRoll());
+            return repository.save(employee);
+        }).orElseGet(() ->{
+            newEmployee.setId(id);
+            return repository.save(newEmployee);
+        });
+    }
+
+    @DeleteMapping("/employee/{id}")
+    void deleteEmployee(@PathVariable Long id){
+        repository.deleteById(id);
     }
 
 
